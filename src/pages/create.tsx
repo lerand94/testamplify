@@ -80,7 +80,7 @@ function Create() {
                 <TextField label="linkFan"  value={linkFan} onChange={e => {setLinkFan(e.target.value)}} />
                 <Label>Image</Label>
                 <StorageManager
-                accessLevel="protected"
+                accessLevel="public"
                 acceptedFileTypes={['images/*']}
                 maxFileCount={1}
                 onUploadSuccess={({ key = '' }) => {
@@ -95,7 +95,7 @@ function Create() {
                 <Label>Archive</Label>
                 <StorageManager
                 path='archives/'
-                accessLevel="protected"
+                accessLevel="public"
                 acceptedFileTypes={[
                     '.rar',
                     '.zip',
