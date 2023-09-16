@@ -74,7 +74,7 @@ export const Layout = ({children}: React.PropsWithChildren) => {
         <View minHeight="100vh" backgroundColor="background.secondary">
             <Flex direction="row" paddingBlock="medium" paddingInline="xl" justifyContent={'space-between'}>
                 <Flex>
-                    <Link href="/">Home</Link>
+                    <Link href="/" color={'#FFC0CB'}>Home</Link>
                     {userGroup == 'Moderator' ? <Link href="/create">Create</Link> : null}
                     {/* <Link href="/archives">Archives</Link> */}
                     <Link href="/test">Test</Link>
