@@ -50,6 +50,7 @@ type EagerPost = {
   readonly linkFan?: string | null;
   readonly country?: string | null;
   readonly archive?: string | null;
+  readonly createdBy?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -68,6 +69,7 @@ type LazyPost = {
   readonly linkFan?: string | null;
   readonly country?: string | null;
   readonly archive?: string | null;
+  readonly createdBy?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

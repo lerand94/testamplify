@@ -133,6 +133,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "createdBy": {
+                    "name": "createdBy",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,

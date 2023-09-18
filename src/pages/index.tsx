@@ -5,7 +5,7 @@ import styles from '@/styles/Home.module.css'
 import React, { useState, useRef } from 'react'
 import { Post } from '@/models'
 import { DataStore, Predicates } from 'aws-amplify'
-import { Flex, SearchField,Grid, Pagination, Collection, Button, TextField, Label } from '@aws-amplify/ui-react'
+import {Flex, SearchField, Grid, Pagination, Collection, Button, TextField, Label, Input} from '@aws-amplify/ui-react'
 import PostCard from '@/components/PostCard'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -18,6 +18,7 @@ export default function Home() {
   const countryRef = useRef('');
   const dateFromRef = useRef('');
   const dateToRef = useRef('');
+  const [title,setTitle] = useState('');
   const [gridTemplate,setGridTemplate] = React.useState('repeat(4, 1fr)')
 
   React.useEffect(() => {
@@ -31,10 +32,28 @@ export default function Home() {
 
       return () => { sub.unsubscribe() }
   }, []);
-  console.log(posts)
+
+    const clearFilter = () => {
+        titleRef.current.value = null;
+        linkRef.current.value = null;
+        descRef.current.value = null;
+        dateFromRef.current.value = null;
+        countryRef.current.value = null;
+        dateToRef.current.value = null;
+    }
+
+  const clearHandler = async () => {
+      let posts;
+      posts = await DataStore.query(Post,Predicates.ALL,{
+          sort: (post) => post.updatedAt("DESCENDING"),
+      });
+      setPosts(posts);
+    }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(linkRef.current.value.split(' '))
     let posts;
     if(titleRef.current.value != '' && 
        linkRef.current.value == "" &&
@@ -47,7 +66,408 @@ export default function Home() {
          posts = await DataStore.query(Post, (p) => p.and(p => [
           p.title.contains(titleRef.current.value)
         ]))
-       } else if(
+   } else if(titleRef.current.value == '' &&
+      linkRef.current.value.split(' ').length > 1 &&
+      descRef.current.value == "" &&
+      dateFromRef.current.value == "" &&
+      dateToRef.current.value == "" &&
+      countryRef.current.value == "") {
+      posts = await DataStore.query(Post, (p) => p.and(p => [
+          p.link.contains(linkRef.current.value.split(' ')[0]),
+          p.link.contains(linkRef.current.value.split(' ')[1])
+      ]))
+      }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.ge(dateFromRef.current.value),
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.le(dateToRef.current.value),
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.le(dateToRef.current.value),
+            p.date.ge(dateFromRef.current.value),
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.le(dateToRef.current.value),
+            p.date.ge(dateFromRef.current.value),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.le(dateToRef.current.value),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.ge(dateFromRef.current.value),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.ge(dateFromRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    } else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value == '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.ge(dateFromRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.date.ge(dateFromRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.country.contains(countryRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }
+    else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.country.contains(countryRef.current.value),
+            p.date.ge(dateFromRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value == "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.country.contains(countryRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.le(dateToRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value == "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value == "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.le(dateToRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value != "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.le(dateToRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(titleRef.current.value != '' &&
+        linkRef.current.value.split(' ').length > 1 &&
+        descRef.current.value != "" &&
+        dateFromRef.current.value != "" &&
+        dateToRef.current.value == "" &&
+        countryRef.current.value != "") {
+        posts = await DataStore.query(Post, (p) => p.and(p => [
+            p.title.contains(titleRef.current.value),
+            p.link.contains(linkRef.current.value.split(' ')[0]),
+            p.link.contains(linkRef.current.value.split(' ')[1]),
+            p.body.contains(descRef.current.value),
+            p.country.contains(countryRef.current.value),
+            p.date.ge(dateFromRef.current.value)
+        ]))
+    }else if(
        titleRef.current.value != '' && 
        linkRef.current.value != "" &&
        descRef.current.value == "" &&
@@ -58,7 +478,7 @@ export default function Home() {
         console.log('title and link not empty')
         posts = await DataStore.query(Post, (p) => p.and(p => [
           p.title.contains(titleRef.current.value),
-          p.link.contains(linkRef.current.value)
+          p.link.contains(linkRef.current.value),
         ]))
        } else if(
        titleRef.current.value != '' && 
@@ -930,7 +1350,9 @@ export default function Home() {
         ]))
         console.log('title and link and desc and country and dateTo not empty')
        }else {
-        posts = await DataStore.query(Post,Predicates.ALL)
+        posts = await DataStore.query(Post,Predicates.ALL,{
+            sort: (post) => post.updatedAt("DESCENDING"),
+        });
         console.log('all empty')
        }
  
@@ -942,42 +1364,30 @@ export default function Home() {
 
   return (
     <>
-      <Flex as='form' direction='raw' onSubmit={handleSubmit}>
+      <Flex as='form' direction='raw' onSubmit={handleSubmit} boxShadow={'large'}  alignItems='center' padding='xl' width={'100%'}>
+        <Flex justifyContent={'space-between'} width={'100%'}>
+            <Flex>
         <Flex direction={'column'}>
           <Label>Title</Label>
-          <SearchField 
-            label="Search by title"
-            placeholder="Search by title" 
-            ref={titleRef}
-            hasSearchButton={false}
-          />
+            <Input placeholder="Search by title" ref={titleRef}/>
         </Flex>
         <Flex direction={'column'}>
           <Label>Link</Label>
-          <SearchField 
-            label="Search by link"
-            placeholder="Search by link" 
-            ref={linkRef}
-            hasSearchButton={false}
-          />
+            <Input placeholder="Search by link"  ref={linkRef}/>
         </Flex>
         <Flex direction={'column'}>
           <Label>Description</Label>
-        <SearchField 
-            label="Search by description"
-            placeholder="Search by description" 
-            ref={descRef}
-            hasSearchButton={false}
-          />
+            <Input placeholder="Search by description"  ref={descRef}/>
         </Flex>
         <Flex direction={'column'}>
           <Label>Country</Label>
-          <SearchField 
-            label="Search by country"
-            placeholder="Search by country" 
-            ref={countryRef}
-            hasSearchButton={false}
-          />
+          {/*<SearchField */}
+          {/*  label="Search by country"*/}
+          {/*  placeholder="Search by country code"*/}
+          {/*  ref={countryRef}*/}
+          {/*  hasSearchButton={false}*/}
+          {/*/>*/}
+            <Input placeholder="Search by country code"  ref={countryRef}/>
         </Flex>
         <TextField type='date'
           label="Date from"
@@ -991,11 +1401,22 @@ export default function Home() {
           ref={dateToRef}
           justifyContent={'space-between'}
         />
+            </Flex>
+            <Flex>
        <Button type='submit'>Search</Button>
+       <Button  onClick={() => {
+           clearHandler();
+           setTimeout(()=> {
+                  clearFilter();
+               }
+               ,100);
+       }} >Clear</Button>
+            </Flex>
+          </Flex>
       </Flex>
-      <Flex direction='column' alignItems='center' padding='xl' backgroundColor="background.secondary">
-        <Flex><Button onClick={(e) => changeGrid(e)}>4</Button><Button onClick={(e) => changeGrid(e)}>6</Button><Button onClick={(e) => changeGrid(e)}>8</Button></Flex>
-        <Collection items={posts} type="grid" templateColumns={gridTemplate} gap='small' isPaginated itemsPerPage={10}>
+      <Flex boxShadow={'large'} direction='column' padding='xl' backgroundColor="background.secondary" grow={'1'} paddingBottom='5px' width={'100%'}>
+        <Flex boxShadow={'medium'} padding={'xs'}  position={'absolute'} bottom={'32px'} right={'32px'} backgroundColor={'#fff'}><Button backgroundColor={'#fff '} onClick={(e) => changeGrid(e)}>4</Button><Button backgroundColor={'#fff'} onClick={(e) => changeGrid(e)}>6</Button><Button backgroundColor={'#fff'} onClick={(e) => changeGrid(e)}>8</Button></Flex>
+        <Collection items={posts} type="grid" templateColumns={gridTemplate} gap='xl' isPaginated itemsPerPage={10} >
           {
             (item,index) => (
               <PostCard post={item} key={index} />

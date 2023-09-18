@@ -1,12 +1,11 @@
 import { StorageManager } from "@aws-amplify/ui-react-storage";
 import { Flex, withAuthenticator, TextField, Button, SelectField ,TabItem,Tabs, Label} from "@aws-amplify/ui-react"
 import {DataStore} from "aws-amplify"
-import React, { useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import { Post,Archives } from "@/models";
 import { useRouter } from "next/router";
 import { countries, getEmojiFlag, getUnicode } from 'countries-list';
-import ReactCountryFlag from "react-country-flag"
-import testJs from '../../test/first.json';
+import {Auth} from "@aws-amplify/auth";
 
 function Create() {
     const [title,setTitle] = React.useState('');
@@ -18,10 +17,21 @@ function Create() {
     const [linkFan,setLinkFan] = React.useState('');
     const [image,setImage] = React.useState('');
     const [archive,setArchive] = React.useState('');
+    const [createdBy,setCreatedBy] = React.useState('');
     const router = useRouter();
 
     const imageRef = useRef(null);
     const archiveRef = useRef(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const userGroupRequest = Auth.currentAuthenticatedUser()
+                .then(data => {
+                    data.username ? setCreatedBy(data.username) : null
+                });
+        }
+        fetchData();
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -35,6 +45,7 @@ function Create() {
                linkFan,
                images: Object.keys(files), 
                archive,
+               createdBy,
             })
         ).then(() => {
             console.log('success')
@@ -65,9 +76,9 @@ function Create() {
     return (
         // <Tabs>
         //     <TabItem title="Creative">
-            <Flex as= "form" direction="column" onSubmit={handleSubmit}>
+            <Flex as= "form" direction="column" onSubmit={handleSubmit} padding={'xl'} boxShadow={'large'} width={'75%'} grow={'1'} justifyContent={'space-between'} borderRadius={'25px'}>
                 <TextField label="title" value={title} onChange={e => {setTitle(e.target.value)}} />
-                <TextField label="body" value={body} onChange={e => {setBody(e.target.value)}} />
+                <TextField label="description" value={body} onChange={e => {setBody(e.target.value)}} />
                 <TextField label="date" type="date" value={date} onChange={e => {setDate(e.target.value)}} />
                 <SelectField label='Country' onChange={e => {setCountry(e.target.value)}}>
                     {Object.entries(countries).map(countryItem => {
@@ -106,7 +117,7 @@ function Create() {
                 }}
                 ref={archiveRef}
                 />
-                <Button type='submit'>Submit</Button>
+                <Button type='submit' alignSelf={'center'} width={'50%'} backgroundColor={'#bfd6e4'}>Submit</Button>
             </Flex>
         //     </TabItem>
         //     <TabItem title="Archives">

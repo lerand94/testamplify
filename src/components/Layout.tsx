@@ -71,15 +71,14 @@ export const Layout = ({children}: React.PropsWithChildren) => {
       };
     
     return (
-        <View minHeight="100vh" backgroundColor="background.secondary">
-            <Flex direction="row" paddingBlock="medium" paddingInline="xl" justifyContent={'space-between'}>
-                <Flex>
+        <Flex minHeight="100vh" backgroundColor="background.secondary" position={'relative'} direction={"column"}>
+            <Flex boxShadow="large" direction="row" paddingBlock="xs" paddingInline="xl" justifyContent={'space-between'} borderRadius={'10px'}>
+                <Flex alignItems={'center'} fontWeight={'bold'}>
                     <Link href="/" color={'#FFC0CB'}>Home</Link>
                     {userGroup == 'Moderator' ? <Link href="/create">Create</Link> : null}
                     {/* <Link href="/archives">Archives</Link> */}
-                    <Link href="/test">Test</Link>
                 </Flex>
-                <Flex>
+                <Flex alignItems={'center'}>
                     {user ? (
                         <>
                         <Text>{user.username}</Text>
@@ -108,12 +107,12 @@ export const Layout = ({children}: React.PropsWithChildren) => {
                 } */}
 
             </Flex>
-            { route === 'authenticated' ? <Flex direction="column" alignItems="center" padding="xl">{children}</Flex> : 
+            { route === 'authenticated' ? <Flex direction="column" alignItems="center" padding="xl" grow={'1'}>{children}</Flex> :
 
                 <Authenticator formFields={formFields} components={components} hideSignUp={true} loginMechanisms={['username']}>
                 </Authenticator>
             } 
             {/* { <Flex direction="column" alignItems="center" padding="xl">{children}</Flex>  }  */}
-        </View>
+        </Flex>
     )
 }
